@@ -1126,8 +1126,8 @@ let stdbuf = pp_make_buffer ()
 
 (* Predefined formatters standard formatter to print
    to [Pervasives.stdout], [Pervasives.stderr], and {!stdbuf}. *)
-let std_formatter = formatter_of_out_channel Pervasives.stdout
-and err_formatter = formatter_of_out_channel Pervasives.stderr
+let std_formatter = formatter_of_out_channel Stdlib.stdout
+and err_formatter = formatter_of_out_channel Stdlib.stderr
 and str_formatter = formatter_of_buffer stdbuf
 
 
@@ -1369,8 +1369,8 @@ let rec strput_acc ppf acc = match acc with
 
 let kfprintf k ppf (Format (fmt, _)) =
   make_printf
-    (fun ppf acc -> output_acc ppf acc; k ppf)
-    ppf End_of_acc fmt
+    (fun acc -> output_acc ppf acc; k ppf)
+    End_of_acc fmt
 
 and ikfprintf k ppf (Format (fmt, _)) =
   make_iprintf k ppf fmt
@@ -1383,10 +1383,10 @@ let eprintf fmt = fprintf err_formatter fmt
 let ksprintf k (Format (fmt, _)) =
   let b = pp_make_buffer () in
   let ppf = formatter_of_buffer b in
-  let k () acc =
+  let k acc =
     strput_acc ppf acc;
     k (flush_buffer_formatter b ppf) in
-  make_printf k () End_of_acc fmt
+  make_printf k End_of_acc fmt
 
 
 let sprintf fmt = ksprintf (fun s -> s) fmt
@@ -1394,10 +1394,10 @@ let sprintf fmt = ksprintf (fun s -> s) fmt
 let kasprintf k (Format (fmt, _)) =
   let b = pp_make_buffer () in
   let ppf = formatter_of_buffer b in
-  let k ppf acc =
+  let k acc =
     output_acc ppf acc;
     k (flush_buffer_formatter b ppf) in
-  make_printf k ppf End_of_acc fmt
+  make_printf k End_of_acc fmt
 
 
 let asprintf fmt = kasprintf (fun s -> s) fmt
@@ -1442,8 +1442,9 @@ let get_all_formatter_output_functions =
    let ppf = formatter_of_buffer b
    then use {!fprintf ppf} as useual. *)
 let bprintf b (Format (fmt, _) : ('a, formatter, unit) format) =
-  let k ppf acc = output_acc ppf acc; pp_flush_queue ppf false in
-  make_printf k (formatter_of_buffer b) End_of_acc fmt
+  let ppf = formatter_of_buffer b in
+  let k acc = output_acc ppf acc; pp_flush_queue ppf false in
+  make_printf k End_of_acc fmt
 
 
 (* Deprecated : alias for ksprintf. *)
