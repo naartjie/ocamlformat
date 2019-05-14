@@ -9,7 +9,6 @@
  *                                                                    *
  **********************************************************************)
 open Migrate_ast
-open Base
 
 type t = string
 (** Concrete syntax. *)
