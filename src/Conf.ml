@@ -1426,7 +1426,7 @@ let ocp_indent_config =
       else
         asprintf " %a"
           (pp_print_list
-             ~pp_sep:(fun fs () -> fprintf fs ",@ ")
+             ~pp_sep:(fun fs () -> fprintf fs "@ ")
              (fun fs s -> fprintf fs "%s" s))
           l
     in
